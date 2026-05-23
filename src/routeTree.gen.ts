@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as ReservationsRouteImport } from './routes/reservations'
 import { Route as MenuRouteImport } from './routes/menu'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as CheckoutRouteImport } from './routes/checkout'
@@ -20,6 +21,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReservationsRoute = ReservationsRouteImport.update({
+  id: '/reservations',
+  path: '/reservations',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MenuRoute = MenuRouteImport.update({
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/login': typeof LoginRoute
   '/menu': typeof MenuRoute
+  '/reservations': typeof ReservationsRoute
   '/signup': typeof SignupRoute
 }
 export interface FileRoutesByTo {
@@ -69,6 +76,7 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/login': typeof LoginRoute
   '/menu': typeof MenuRoute
+  '/reservations': typeof ReservationsRoute
   '/signup': typeof SignupRoute
 }
 export interface FileRoutesById {
@@ -79,6 +87,7 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/login': typeof LoginRoute
   '/menu': typeof MenuRoute
+  '/reservations': typeof ReservationsRoute
   '/signup': typeof SignupRoute
 }
 export interface FileRouteTypes {
@@ -90,9 +99,18 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/login'
     | '/menu'
+    | '/reservations'
     | '/signup'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/account' | '/cart' | '/checkout' | '/login' | '/menu' | '/signup'
+  to:
+    | '/'
+    | '/account'
+    | '/cart'
+    | '/checkout'
+    | '/login'
+    | '/menu'
+    | '/reservations'
+    | '/signup'
   id:
     | '__root__'
     | '/'
@@ -101,6 +119,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/login'
     | '/menu'
+    | '/reservations'
     | '/signup'
   fileRoutesById: FileRoutesById
 }
@@ -111,6 +130,7 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   LoginRoute: typeof LoginRoute
   MenuRoute: typeof MenuRoute
+  ReservationsRoute: typeof ReservationsRoute
   SignupRoute: typeof SignupRoute
 }
 
@@ -121,6 +141,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reservations': {
+      id: '/reservations'
+      path: '/reservations'
+      fullPath: '/reservations'
+      preLoaderRoute: typeof ReservationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/menu': {
@@ -175,6 +202,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   LoginRoute: LoginRoute,
   MenuRoute: MenuRoute,
+  ReservationsRoute: ReservationsRoute,
   SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport
