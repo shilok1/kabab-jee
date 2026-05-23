@@ -15,6 +15,7 @@ import {
 const links = [
   { to: "/", label: "Home" },
   { to: "/menu", label: "Menu" },
+  { to: "/account", label: "Orders" },
   { to: "/reservations", label: "Reservations" },
   { to: "/about", label: "About" },
 ];
