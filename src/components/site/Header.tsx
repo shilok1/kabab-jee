@@ -72,6 +72,7 @@ export default function Header() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild><Link to="/account">My Orders</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/account">Order History</Link></DropdownMenuItem>
                 {isAdmin && (
                   <DropdownMenuItem asChild>
                     <Link to="/admin"><Shield className="mr-2 h-4 w-4" />Admin Panel</Link>
