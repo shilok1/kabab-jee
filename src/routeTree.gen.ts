@@ -20,6 +20,7 @@ import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminMenuRouteImport } from './routes/admin.menu'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -76,6 +77,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminMenuRoute = AdminMenuRouteImport.update({
+  id: '/menu',
+  path: '/menu',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/menu': typeof MenuRoute
   '/reservations': typeof ReservationsRoute
   '/signup': typeof SignupRoute
+  '/admin/menu': typeof AdminMenuRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -100,6 +107,7 @@ export interface FileRoutesByTo {
   '/menu': typeof MenuRoute
   '/reservations': typeof ReservationsRoute
   '/signup': typeof SignupRoute
+  '/admin/menu': typeof AdminMenuRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
@@ -114,6 +122,7 @@ export interface FileRoutesById {
   '/menu': typeof MenuRoute
   '/reservations': typeof ReservationsRoute
   '/signup': typeof SignupRoute
+  '/admin/menu': typeof AdminMenuRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -129,6 +138,7 @@ export interface FileRouteTypes {
     | '/menu'
     | '/reservations'
     | '/signup'
+    | '/admin/menu'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
     | '/menu'
     | '/reservations'
     | '/signup'
+    | '/admin/menu'
     | '/admin'
   id:
     | '__root__'
@@ -154,6 +165,7 @@ export interface FileRouteTypes {
     | '/menu'
     | '/reservations'
     | '/signup'
+    | '/admin/menu'
     | '/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -249,14 +261,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/menu': {
+      id: '/admin/menu'
+      path: '/menu'
+      fullPath: '/admin/menu'
+      preLoaderRoute: typeof AdminMenuRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
+  AdminMenuRoute: typeof AdminMenuRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminMenuRoute: AdminMenuRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
