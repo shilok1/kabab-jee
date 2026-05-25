@@ -20,6 +20,7 @@ import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminTablesRouteImport } from './routes/admin.tables'
 import { Route as AdminMenuRouteImport } from './routes/admin.menu'
 
 const SignupRoute = SignupRouteImport.update({
@@ -77,6 +78,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminTablesRoute = AdminTablesRouteImport.update({
+  id: '/tables',
+  path: '/tables',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminMenuRoute = AdminMenuRouteImport.update({
   id: '/menu',
   path: '/menu',
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/reservations': typeof ReservationsRoute
   '/signup': typeof SignupRoute
   '/admin/menu': typeof AdminMenuRoute
+  '/admin/tables': typeof AdminTablesRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/reservations': typeof ReservationsRoute
   '/signup': typeof SignupRoute
   '/admin/menu': typeof AdminMenuRoute
+  '/admin/tables': typeof AdminTablesRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
@@ -123,6 +131,7 @@ export interface FileRoutesById {
   '/reservations': typeof ReservationsRoute
   '/signup': typeof SignupRoute
   '/admin/menu': typeof AdminMenuRoute
+  '/admin/tables': typeof AdminTablesRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -139,6 +148,7 @@ export interface FileRouteTypes {
     | '/reservations'
     | '/signup'
     | '/admin/menu'
+    | '/admin/tables'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -152,6 +162,7 @@ export interface FileRouteTypes {
     | '/reservations'
     | '/signup'
     | '/admin/menu'
+    | '/admin/tables'
     | '/admin'
   id:
     | '__root__'
@@ -166,6 +177,7 @@ export interface FileRouteTypes {
     | '/reservations'
     | '/signup'
     | '/admin/menu'
+    | '/admin/tables'
     | '/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -261,6 +273,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/tables': {
+      id: '/admin/tables'
+      path: '/tables'
+      fullPath: '/admin/tables'
+      preLoaderRoute: typeof AdminTablesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/menu': {
       id: '/admin/menu'
       path: '/menu'
@@ -273,11 +292,13 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminMenuRoute: typeof AdminMenuRoute
+  AdminTablesRoute: typeof AdminTablesRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminMenuRoute: AdminMenuRoute,
+  AdminTablesRoute: AdminTablesRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
@@ -298,3 +319,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
