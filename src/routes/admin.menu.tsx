@@ -88,7 +88,8 @@ function AdminMenu() {
   };
 
   const toggle = async (id: string, field: "available" | "featured", value: boolean) => {
-    const { error } = await supabase.from("menu_items").update({ [field]: value }).eq("id", id);
+    const patch = field === "available" ? { available: value } : { featured: value };
+    const { error } = await supabase.from("menu_items").update(patch).eq("id", id);
     if (error) return toast.error(error.message);
     refetch();
   };
