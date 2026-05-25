@@ -14,6 +14,7 @@ import { CartProvider } from "@/lib/cart";
 import { AuthProvider } from "@/lib/auth";
 import Header from "@/components/site/Header";
 import Footer from "@/components/site/Footer";
+import ShopStatusBanner from "@/components/site/ShopStatusBanner";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -124,6 +125,7 @@ function RootComponent() {
           <CartProvider>
             <div className="flex min-h-screen flex-col">
               <Header />
+              <ShopStatusBanner />
               <main className="flex-1">
                 <Outlet />
               </main>
