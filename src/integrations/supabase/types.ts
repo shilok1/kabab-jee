@@ -253,6 +253,36 @@ export type Database = {
         }
         Relationships: []
       }
+      restaurant_tables: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          notes: string | null
+          seats: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          notes?: string | null
+          seats: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          notes?: string | null
+          seats?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           comment: string | null
@@ -287,6 +317,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      shop_settings: {
+        Row: {
+          closed_message: string | null
+          id: string
+          is_open: boolean
+          updated_at: string
+        }
+        Insert: {
+          closed_message?: string | null
+          id?: string
+          is_open?: boolean
+          updated_at?: string
+        }
+        Update: {
+          closed_message?: string | null
+          id?: string
+          is_open?: boolean
+          updated_at?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
