@@ -4,9 +4,10 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Utensils } from "lucide-react";
+import { Utensils, Leaf, Drumstick } from "lucide-react";
 import { formatPKR, useCart } from "@/lib/cart";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/menu")({
   head: () => ({
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/menu")({
 
 function MenuPage() {
   const [activeCat, setActiveCat] = useState<string | "all">("all");
+  const [foodFilter, setFoodFilter] = useState<"all" | "veg" | "non_veg">("all");
   const { add } = useCart();
 
   const { data: categories } = useQuery({
@@ -34,28 +36,110 @@ function MenuPage() {
   });
 
   const { data: items } = useQuery({
-    queryKey: ["menu-items", activeCat],
+    queryKey: ["menu-items", activeCat, foodFilter],
     queryFn: async () => {
-      let q = supabase.from("menu_items").select("*").eq("available", true);
+      let q = supabase.from("menu_items").select("*, categories!inner(food_type)").eq("available", true);
       if (activeCat !== "all") q = q.eq("category_id", activeCat);
+      if (foodFilter !== "all") q = q.eq("categories.food_type", foodFilter);
       const { data, error } = await q.order("name");
       if (error) throw error;
       return data ?? [];
     },
   });
 
+  const vegCats = (categories ?? []).filter((c: any) => c.food_type === "veg");
+  const nonVegCats = (categories ?? []).filter((c: any) => c.food_type === "non_veg");
+  const showVeg = foodFilter === "all" || foodFilter === "veg";
+  const showNonVeg = foodFilter === "all" || foodFilter === "non_veg";
+
+  const CatRow = ({ list }: { list: any[] }) => (
+    <div className="-mx-1 overflow-x-auto pb-2 [scrollbar-width:thin] [-webkit-overflow-scrolling:touch]">
+      <div className="flex gap-2 px-1 snap-x snap-mandatory">
+        {list.map((c) => (
+          <Button
+            key={c.id}
+            size="sm"
+            variant={activeCat === c.id ? "default" : "outline"}
+            onClick={() => setActiveCat((p) => (p === c.id ? "all" : c.id))}
+            className="shrink-0 snap-start rounded-full"
+          >
+            {c.name}
+          </Button>
+        ))}
+        {list.length === 0 && (
+          <span className="px-2 py-1 text-sm text-muted-foreground">No categories</span>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-4xl font-bold tracking-tight md:text-5xl">Our Menu</h1>
       <p className="mt-2 text-muted-foreground">Fresh from the tandoor and the karahi pan.</p>
 
-      <div className="mt-8 flex flex-wrap gap-2">
-        <Button variant={activeCat === "all" ? "default" : "outline"} size="sm" onClick={() => setActiveCat("all")}>All</Button>
-        {(categories ?? []).map((c) => (
-          <Button key={c.id} variant={activeCat === c.id ? "default" : "outline"} size="sm" onClick={() => setActiveCat(c.id)}>
-            {c.name}
-          </Button>
+      <div className="mt-8 inline-flex rounded-full border border-border/60 bg-muted/40 p-1">
+        {([
+          { k: "veg", label: "Veg", icon: Leaf },
+          { k: "all", label: "All", icon: Utensils },
+          { k: "non_veg", label: "Non-Veg", icon: Drumstick },
+        ] as const).map(({ k, label, icon: Icon }) => (
+          <button
+            key={k}
+            onClick={() => { setFoodFilter(k); setActiveCat("all"); }}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition-all",
+              foodFilter === k
+                ? "bg-primary text-primary-foreground shadow"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Icon className="h-4 w-4" />
+            {label}
+          </button>
         ))}
+      </div>
+
+      <div className="mt-6 space-y-4">
+        <div
+          className={cn(
+            "grid transition-all duration-300 ease-out",
+            showVeg ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+          )}
+        >
+          <div className="overflow-hidden">
+            <div className="flex items-center gap-3 rounded-xl border border-secondary/30 bg-secondary/10 p-3">
+              <div className="flex items-center gap-1.5 shrink-0 text-sm font-semibold text-secondary-foreground">
+                <Leaf className="h-4 w-4 text-secondary" />
+                Veg
+              </div>
+              <div className="h-6 w-px bg-border" />
+              <div className="min-w-0 flex-1">
+                <CatRow list={vegCats} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "grid transition-all duration-300 ease-out",
+            showNonVeg ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+          )}
+        >
+          <div className="overflow-hidden">
+            <div className="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/10 p-3">
+              <div className="flex items-center gap-1.5 shrink-0 text-sm font-semibold">
+                <Drumstick className="h-4 w-4 text-primary" />
+                Non-Veg
+              </div>
+              <div className="h-6 w-px bg-border" />
+              <div className="min-w-0 flex-1">
+                <CatRow list={nonVegCats} />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
