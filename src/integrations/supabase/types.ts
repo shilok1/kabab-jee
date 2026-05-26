@@ -19,6 +19,7 @@ export type Database = {
           created_at: string
           description: string | null
           display_order: number
+          food_type: Database["public"]["Enums"]["food_type"]
           id: string
           image_url: string | null
           name: string
@@ -28,6 +29,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           display_order?: number
+          food_type?: Database["public"]["Enums"]["food_type"]
           id?: string
           image_url?: string | null
           name: string
@@ -37,6 +39,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           display_order?: number
+          food_type?: Database["public"]["Enums"]["food_type"]
           id?: string
           image_url?: string | null
           name?: string
@@ -375,6 +378,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "customer"
+      food_type: "veg" | "non_veg"
       order_status:
         | "pending"
         | "confirmed"
@@ -518,6 +522,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "customer"],
+      food_type: ["veg", "non_veg"],
       order_status: [
         "pending",
         "confirmed",
