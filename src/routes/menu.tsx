@@ -78,26 +78,39 @@ function MenuPage() {
       <h1 className="text-4xl font-bold tracking-tight md:text-5xl">Our Menu</h1>
       <p className="mt-2 text-muted-foreground">Fresh from the tandoor and the karahi pan.</p>
 
-      <div className="mt-8 inline-flex rounded-full border border-border/60 bg-muted/40 p-1">
-        {([
-          { k: "veg", label: "Veg", icon: Leaf },
-          { k: "all", label: "All", icon: Utensils },
-          { k: "non_veg", label: "Non-Veg", icon: Drumstick },
-        ] as const).map(({ k, label, icon: Icon }) => (
-          <button
-            key={k}
-            onClick={() => { setFoodFilter(k); setActiveCat("all"); }}
-            className={cn(
-              "inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition-all",
-              foodFilter === k
-                ? "bg-primary text-primary-foreground shadow"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <Icon className="h-4 w-4" />
-            {label}
-          </button>
-        ))}
+      <div className="mt-8 flex items-stretch gap-3">
+        <button
+          onClick={() => { setFoodFilter("all"); setActiveCat("all"); }}
+          className={cn(
+            "flex min-w-[88px] flex-col items-center justify-center rounded-xl border px-5 text-sm font-semibold transition-all",
+            foodFilter === "all"
+              ? "border-primary bg-primary text-primary-foreground shadow"
+              : "border-border bg-muted/40 text-foreground hover:bg-muted"
+          )}
+        >
+          <Utensils className="mb-1 h-4 w-4" />
+          All
+        </button>
+        <div className="flex flex-col gap-2">
+          {([
+            { k: "veg", label: "Veg", icon: Leaf },
+            { k: "non_veg", label: "Non-Veg", icon: Drumstick },
+          ] as const).map(({ k, label, icon: Icon }) => (
+            <button
+              key={k}
+              onClick={() => { setFoodFilter(k); setActiveCat("all"); }}
+              className={cn(
+                "inline-flex min-w-[110px] items-center justify-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-semibold transition-all",
+                foodFilter === k
+                  ? "border-primary bg-primary text-primary-foreground shadow"
+                  : "border-border bg-muted/40 text-foreground hover:bg-muted"
+              )}
+            >
+              <Icon className="h-4 w-4" />
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="mt-6 space-y-4">
