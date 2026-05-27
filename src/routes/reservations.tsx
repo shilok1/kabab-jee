@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { Users, CheckCircle2, XCircle, Clock } from "lucide-react";
 
 export const Route = createFileRoute("/reservations")({
   head: () => ({ meta: [{ title: "Book a Table — Kabab Jee" }] }),
@@ -17,6 +19,32 @@ export const Route = createFileRoute("/reservations")({
 function ReservationsPage() {
   const { user, loading } = useAuth();
   const nav = useNavigate();
+  const { data: tables } = useQuery({
+    queryKey: ["public-tables"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("restaurant_tables")
+        .select("id,label,seats,status");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const stats = (() => {
+    const list = tables ?? [];
+    const by = (s: string) => list.filter((t) => t.status === s);
+    const seatsOf = (s: string) => by(s).reduce((sum, t) => sum + (t.seats || 0), 0);
+    return {
+      total: list.length,
+      free: by("free").length,
+      booked: by("booked").length,
+      reserved: by("reserved").length,
+      freeSeats: seatsOf("free"),
+      bookedSeats: seatsOf("booked"),
+      reservedSeats: seatsOf("reserved"),
+    };
+  })();
+
   const [form, setForm] = useState({
     customer_name: "",
     customer_phone: "",
@@ -54,6 +82,46 @@ function ReservationsPage() {
     <div className="container mx-auto max-w-2xl px-4 py-12">
       <h1 className="text-3xl font-bold">Book a Table</h1>
       <p className="mt-1 text-sm text-muted-foreground">Reserve your spot — we'll have the kababs ready.</p>
+
+      <div className="mt-6 grid grid-cols-3 gap-3">
+        <Card className="border-green-500/30 bg-green-500/5">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+              <CheckCircle2 className="h-4 w-4" />
+              <span className="text-xs font-medium uppercase">Free</span>
+            </div>
+            <div className="mt-2 text-2xl font-bold">{stats.free}</div>
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Users className="h-3 w-3" /> {stats.freeSeats} seats
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-red-500/30 bg-red-500/5">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
+              <XCircle className="h-4 w-4" />
+              <span className="text-xs font-medium uppercase">Booked</span>
+            </div>
+            <div className="mt-2 text-2xl font-bold">{stats.booked}</div>
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Users className="h-3 w-3" /> {stats.bookedSeats} seats
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-amber-500/30 bg-amber-500/5">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+              <Clock className="h-4 w-4" />
+              <span className="text-xs font-medium uppercase">Reserved</span>
+            </div>
+            <div className="mt-2 text-2xl font-bold">{stats.reserved}</div>
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Users className="h-3 w-3" /> {stats.reservedSeats} seats
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       <Card className="mt-8">
         <CardContent className="p-6">
           <form onSubmit={onSubmit} className="space-y-4">
