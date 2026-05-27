@@ -20,19 +20,33 @@ type CartCtx = {
 
 const Ctx = createContext<CartCtx | null>(null);
 const KEY = "kj-cart";
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
+
+function readCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith(name + "="));
+  return match ? decodeURIComponent(match.slice(name.length + 1)) : null;
+}
+
+function writeCookie(name: string, value: string) {
+  if (typeof document === "undefined") return;
+  document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
+}
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(KEY);
+      const raw = readCookie(KEY);
       if (raw) setItems(JSON.parse(raw));
     } catch {}
   }, []);
 
   useEffect(() => {
-    try { localStorage.setItem(KEY, JSON.stringify(items)); } catch {}
+    try { writeCookie(KEY, JSON.stringify(items)); } catch {}
   }, [items]);
 
   const add: CartCtx["add"] = (item, qty = 1) => {
