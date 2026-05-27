@@ -80,7 +80,7 @@ function Index() {
             <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Signature Dishes</h2>
             <p className="mt-1 text-muted-foreground">Our chefs' most-loved plates.</p>
           </div>
-          <Link to="/menu" className="hidden text-sm font-medium text-primary hover:underline md:inline-flex">
+          <Link to="/menu" className="text-sm font-medium text-primary hover:underline inline-flex">
             View full menu →
           </Link>
         </div>
