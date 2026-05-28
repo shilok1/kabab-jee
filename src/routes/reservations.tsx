@@ -10,6 +10,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { Users, CheckCircle2, XCircle, Clock } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { OtpDialog } from "@/components/site/OtpDialog";
 
 export const Route = createFileRoute("/reservations")({
   head: () => ({ meta: [{ title: "Book a Table — Kabab Jee" }] }),
@@ -51,29 +53,43 @@ function ReservationsPage() {
     reservation_at: "",
     party_size: 2,
     special_requests: "",
+    table_id: "",
   });
   const [submitting, setSubmitting] = useState(false);
+  const [otpOpen, setOtpOpen] = useState(false);
+
+  const freeTables = (tables ?? []).filter((t) => t.status === "free").sort((a, b) => a.seats - b.seats);
 
   useEffect(() => {
     if (!loading && !user) nav({ to: "/login", search: { redirect: "/reservations" } });
   }, [loading, user, nav]);
 
-  const onSubmit = async (e: React.FormEvent) => {
+  const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
+    if (!form.table_id) return toast.error("Please choose a table");
+    setOtpOpen(true);
+  };
+
+  const submitReservation = async () => {
+    if (!user) return;
+    setOtpOpen(false);
     setSubmitting(true);
+    const chosen = freeTables.find((t) => t.id === form.table_id);
+    const tableNote = chosen ? `Table: ${chosen.label} (${chosen.seats} seats)` : "";
+    const notes = [tableNote, form.special_requests].filter(Boolean).join(" — ");
     const { error } = await supabase.from("reservations").insert({
       user_id: user.id,
       customer_name: form.customer_name,
       customer_phone: form.customer_phone,
       reservation_at: new Date(form.reservation_at).toISOString(),
       party_size: Number(form.party_size),
-      special_requests: form.special_requests || null,
+      special_requests: notes || null,
     });
     setSubmitting(false);
     if (error) return toast.error(error.message);
     toast.success("Reservation requested! We'll confirm shortly.");
-    setForm({ customer_name: "", customer_phone: "", reservation_at: "", party_size: 2, special_requests: "" });
+    setForm({ customer_name: "", customer_phone: "", reservation_at: "", party_size: 2, special_requests: "", table_id: "" });
   };
 
   if (!user) return null;
@@ -131,6 +147,22 @@ function ReservationsPage() {
               <div><Label>Date & time</Label><Input type="datetime-local" required value={form.reservation_at} onChange={(e) => setForm({ ...form, reservation_at: e.target.value })} /></div>
               <div><Label>Party size</Label><Input type="number" min={1} max={30} required value={form.party_size} onChange={(e) => setForm({ ...form, party_size: Number(e.target.value) })} /></div>
             </div>
+            <div>
+              <Label>Choose your table</Label>
+              <Select value={form.table_id} onValueChange={(v) => setForm({ ...form, table_id: v })}>
+                <SelectTrigger>
+                  <SelectValue placeholder={freeTables.length ? "Select an available table" : "No free tables right now"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {freeTables.map((t) => (
+                    <SelectItem key={t.id} value={t.id}>
+                      {t.label} — {t.seats} seats
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="mt-1 text-xs text-muted-foreground">Only free tables are shown.</p>
+            </div>
             <div><Label>Special requests (optional)</Label><Textarea rows={3} value={form.special_requests} onChange={(e) => setForm({ ...form, special_requests: e.target.value })} /></div>
             <Button type="submit" size="lg" disabled={submitting} className="w-full">
               {submitting ? "Submitting..." : "Request reservation"}
@@ -138,6 +170,17 @@ function ReservationsPage() {
           </form>
         </CardContent>
       </Card>
+      {user?.email && (
+        <OtpDialog
+          open={otpOpen}
+          email={user.email}
+          purpose="reauthentication"
+          title="Confirm your reservation"
+          description={`We've sent a 6-digit code to ${user.email}. Enter it to confirm your booking.`}
+          onVerified={submitReservation}
+          onCancel={() => setOtpOpen(false)}
+        />
+      )}
     </div>
   );
 }

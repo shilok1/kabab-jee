@@ -19,8 +19,8 @@ function AboutPage() {
       </div>
       <h1 className="mt-4 text-4xl font-bold tracking-tight">Three generations of Pakistani BBQ</h1>
       <p className="mt-6 text-lg text-muted-foreground">
-        Kabab Jee started as a small charcoal grill in old Lahore in 1972. Today, we bring the same family recipes —
-        slow-marinated meats, hand-ground spices, and that unmistakable smoky char — straight to your table.
+        KababJee Hyderabad started as a small charcoal grill in 1972. Today, we bring the same family recipes —
+        slow-marinated meats, hand-ground spices, and that unmistakable smoky char — straight to your table in Hyderabad.
       </p>
       <p className="mt-4 text-muted-foreground">
         Every kabab is hand-skewered, every karahi is cooked to order in a heavy iron pan, and every biryani is layered

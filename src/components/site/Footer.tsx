@@ -16,7 +16,7 @@ export default function Footer() {
         <div>
           <h4 className="mb-3 text-sm font-semibold">Visit Us</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /> Main Boulevard, Lahore</li>
+            <li className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /> KababJee, Hyderabad</li>
             <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-primary" /> +92 300 1234567</li>
             <li className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /> 12:00 PM – 1:00 AM</li>
           </ul>
