@@ -11,7 +11,6 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CreditCard, Banknote } from "lucide-react";
-import { OtpDialog } from "@/components/site/OtpDialog";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({ meta: [{ title: "Checkout — Kabab Jee" }] }),
@@ -23,7 +22,6 @@ function CheckoutPage() {
   const { user, loading } = useAuth();
   const nav = useNavigate();
   const [submitting, setSubmitting] = useState(false);
-  const [otpOpen, setOtpOpen] = useState(false);
   const [form, setForm] = useState({
     customer_name: "", customer_phone: "", delivery_address: "", notes: "",
     payment_method: "cod" as "cod" | "card",
@@ -55,12 +53,11 @@ function CheckoutPage() {
       if (!/^\d{2}\/\d{2}$/.test(form.card_expiry)) return toast.error("Expiry must be MM/YY");
       if (!/^\d{3,4}$/.test(form.card_cvc)) return toast.error("Invalid CVC");
     }
-    setOtpOpen(true);
+    void placeOrder();
   };
 
   const placeOrder = async () => {
     if (!user) return;
-    setOtpOpen(false);
     setSubmitting(true);
     try {
       const { data: order, error } = await supabase.from("orders").insert({
@@ -136,17 +133,6 @@ function CheckoutPage() {
           <div className="flex justify-between text-base font-semibold"><span>Total</span><span className="text-primary">{formatPKR(total)}</span></div>
         </div>
       </CardContent></Card>
-      {user?.email && (
-        <OtpDialog
-          open={otpOpen}
-          email={user.email}
-          purpose="reauthentication"
-          title="Confirm your order"
-          description={`We've sent a 6-digit code to ${user.email}. Enter it to place your order.`}
-          onVerified={placeOrder}
-          onCancel={() => setOtpOpen(false)}
-        />
-      )}
     </div>
   );
 }

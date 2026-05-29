@@ -11,7 +11,6 @@ import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { Users, CheckCircle2, XCircle, Clock } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { OtpDialog } from "@/components/site/OtpDialog";
 
 export const Route = createFileRoute("/reservations")({
   head: () => ({ meta: [{ title: "Book a Table — Kabab Jee" }] }),
@@ -56,7 +55,6 @@ function ReservationsPage() {
     table_id: "",
   });
   const [submitting, setSubmitting] = useState(false);
-  const [otpOpen, setOtpOpen] = useState(false);
 
   const freeTables = (tables ?? []).filter((t) => t.status === "free").sort((a, b) => a.seats - b.seats);
 
@@ -68,12 +66,11 @@ function ReservationsPage() {
     e.preventDefault();
     if (!user) return;
     if (!form.table_id) return toast.error("Please choose a table");
-    setOtpOpen(true);
+    void submitReservation();
   };
 
   const submitReservation = async () => {
     if (!user) return;
-    setOtpOpen(false);
     setSubmitting(true);
     const chosen = freeTables.find((t) => t.id === form.table_id);
     const tableNote = chosen ? `Table: ${chosen.label} (${chosen.seats} seats)` : "";
@@ -170,17 +167,6 @@ function ReservationsPage() {
           </form>
         </CardContent>
       </Card>
-      {user?.email && (
-        <OtpDialog
-          open={otpOpen}
-          email={user.email}
-          purpose="reauthentication"
-          title="Confirm your reservation"
-          description={`We've sent a 6-digit code to ${user.email}. Enter it to confirm your booking.`}
-          onVerified={submitReservation}
-          onCancel={() => setOtpOpen(false)}
-        />
-      )}
     </div>
   );
 }
